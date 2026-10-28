@@ -23,14 +23,16 @@ Build once, then run:
 make build
 
 export SNYK_TOKEN=<your-snyk-api-token>
-./snyk-deps-to-csv-go --org <org-id> --output dependencies.csv
+# export a single org dependencies
+./snyk-deps-to-csv --org <org-id> --output dependencies.csv
+# export a group dependencies, generating csv file for every org in group
+./snyk-deps-to-csv --group <group-id> --output-dir "./dep-csvs"
 ```
 
 Or install to `$GOPATH/bin`:
 
 ```sh
 go install ./cmd/snyk-deps-to-csv     # installs a binary named "snyk-deps-to-csv" (the directory name)
-snyk-deps-to-csv --org <org-id>
 ```
 
 ### Options
@@ -53,21 +55,21 @@ snyk-deps-to-csv --org <org-id>
 ### Examples
 
 ```sh
-# Everything in an org
-SNYK_TOKEN=... ./snyk-deps-to-csv-go --org 1111-2222
+# Everything in an org, ensure Group-level service account token
+SNYK_TOKEN=... ./snyk-deps-to-csv --group 1111-2222 --output-dir "./dep-csvs"
 
 # Only certain language dependencies, from two projects
-./snyk-deps-to-csv-go --org 1111-2222 --languages java,python \
+./snyk-deps-to-csv --org 1111-2222 --languages java,python \
   --projects <project-id-1>,<project-id-2> --output npm-maven.csv
 
 # Using the org env var
-SNYK_ORG_ID=1111-2222 ./snyk-deps-to-csv-go --dependencies lodash@4.17.21
+SNYK_ORG_ID=1111-2222 ./snyk-deps-to-csv --dependencies lodash@4.17.21
 
 # Every organization in a group -> out/dependencies_<orgID>.csv for each org
-./snyk-deps-to-csv-go --group <group-id> --output-dir out
+./snyk-deps-to-csv --group <group-id> --output-dir out
 
 # Only critical/high severity issues in MIT-licensed dependencies
-./snyk-deps-to-csv-go --org 1111-2222 --severity critical,high --licenses MIT
+./snyk-deps-to-csv --org 1111-2222 --severity critical,high --licenses MIT
 ```
 
 Progress is logged to stderr (`page 3/12 fetched (3000/11432 dependencies)`). Flags use double dashes (`--org`); list flags accept comma-separated values and/or can be repeated. Exit codes: `0` success, `1` export failed or incomplete, `2` bad arguments. Ctrl-C cancels cleanly.
@@ -116,7 +118,6 @@ Valid `--severity` values: `critical`, `high`, `medium`, `low`.
 git clone <repo> && cd snyk-deps-to-csv-go
 go mod download
 
-go run ./cmd/snyk --org <org-id>          # run without building (needs SNYK_TOKEN)
 go build ./...                  # compile check
 go vet ./...
 go test ./...                   # httptest-based; no network or token needed
@@ -126,7 +127,7 @@ go test ./...                   # httptest-based; no network or token needed
 
 | File | Purpose |
 |------|---------|
-| `cmd/snyk/main.go` | Flag parsing, wiring, exit codes |
+| `cmd/snyk-deps-to-csv/main.go` | Flag parsing, wiring, exit codes |
 | `internal/client/client.go` | API client built on `retryablehttp`; `FetchPage` |
 | `internal/client/limiter.go` | `http.RoundTripper` applying the uber and x/time limiters per attempt |
 | `internal/client/export.go` | Pagination loop, completeness check, CSV writer (temp file + atomic rename) |
@@ -134,7 +135,7 @@ go test ./...                   # httptest-based; no network or token needed
 | `internal/model/orgs.go` | `ListGroupOrgs`: REST "list all organizations in group" with `links.next` pagination |
 | `internal/model/group.go` | `ExportGroup`: one CSV per organization, sharing one client and rate limiter |
 | `internal/model/*_test.go` | Group listing and per-org export tests |
-| `cmd/snyk/main_test.go` | CLI flag/severity validation tests |
+| `cmd/snyk-deps-to-csv/main_test.go` | CLI flag/severity validation tests |
 
 ### Testing against a mock server
 
