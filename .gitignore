@@ -1,0 +1,39 @@
+# Built binaries (make build / build-windows)
+/snyk-deps-to-csv
+/snyk-deps-to-csv-go
+/snyk-deps-to-csv.exe
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Test binaries, coverage and profiles (make test writes cp.out)
+*.test
+*.out
+coverage.*
+*.prof
+
+# Generated exports: dependency data from your Snyk orgs, not source
+*.csv
+output_csv/
+out/
+.deps-*.csv.tmp
+
+# Secrets / local config
+.env
+.env.*
+*.pem
+
+# Go workspace and vendoring
+go.work
+go.work.sum
+vendor/
+
+# Editors and OS
+.idea/
+.vscode/
+*.swp
+.DS_Store
+
+# Claude Code local settings
+.claude/settings.local.json
