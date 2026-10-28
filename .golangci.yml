@@ -1,0 +1,68 @@
+version: "2"
+run:
+  tests: false
+linters:
+  default: none
+  enable:
+    - asciicheck
+    - bodyclose
+    - copyloopvar
+    - dogsled
+    - dupl
+    - errcheck
+    - funlen
+    - gocognit
+    - goconst
+    - gocritic
+    - gocyclo
+    - goprintffuncname
+    - gosec
+    - govet
+    - ineffassign
+    - misspell
+    - nakedret
+    - nolintlint
+    - revive
+    - staticcheck
+    - unconvert
+    - unparam
+    - unused
+    - whitespace
+  settings:
+    funlen:
+      lines: 100
+      statements: 80
+    gocognit:
+      min-complexity: 70
+    gocritic:
+      enabled-tags:
+        - diagnostic
+      settings:
+        ifElseChain:
+          minThreshold: 4
+    gosec:
+      excludes:
+        - G115
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
+issues:
+  max-same-issues: 25
+formatters:
+  enable:
+    - gofmt
+    - goimports
+  exclusions:
+    generated: lax
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
